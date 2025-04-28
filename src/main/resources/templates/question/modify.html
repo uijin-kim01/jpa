@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head::myHead('WRITE')}"></head>
+
+<body>
+<header th:replace="~{fragments/header}"></header>
+<div class="container">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <h2 class="my-5">글 수정</h2>
+            <form th:action="@{/question/modify}" method="post">
+                <input type="hidden" name="id" th:value="${questionDto.id}"/>
+                <div class="col-12">
+                    <label for="title" class="form-label fw-bold">TITLE</label>
+                    <input type="text" class="form-control" id="title" placeholder="제목을 씁니다." name="title"
+                           th:value="${questionDto.title}" >
+                </div>
+                <div class="col-12">
+                    <label for="content" class="form-label fw-bold">CONTENT</label>
+                    <textarea type="text" class="form-control" id="content"
+                              placeholder="내용을 씁니다." name="content" th:text="${questionDto.content}">
+
+          </textarea>
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-primary" >DONE</button>
+                    <a class="btn btn-primary" href="" th:href="@{/question/list}">Back to List</a>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-2"></div>
+
+    </div>
+</div>
+<footer th:replace="~{fragments/footer}"></footer>
+
+</body>
+</html>

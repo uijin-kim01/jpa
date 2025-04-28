@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<header th:replace="~{fragments/header}"></header>
+<div class="container">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <h2 class="my-5">글 내용</h2>
+            <div class="col-12">
+                <label for="title" class="form-label fw-bold">TITLE</label>
+                <input type="hidden" name="id" th:value="${questionDto.id}"/>
+                <input type="text" class="form-control" id="title" placeholder="제목을 씁니다." name="title"
+                       th:value="${questionDto.title}" readonly>
+            </div>
+            <div class="col-12">
+                <label for="content" class="form-label fw-bold">CONTENT</label>
+                <textarea type="text" class="form-control" id="content"
+                          placeholder="내용을 씁니다." name="content" th:text="${questionDto.content}" readonly>
+
+          </textarea>
+            </div>
+            <div class="col-12">
+                <!--                <button class="btn btn-primary" id="btn-signin">WRITE</button>-->
+                <a class="btn btn-primary" href="" th:href="@{/question/modify/{id}(id=${questionDto.id})}">MODIFY</a>
+            </div>
+
+            <div class="mt-5">
+                <form action="" th:action="@{/comment/write/{id}(id=${questionDto.id})}" method="post">
+                    <div class="col-12">
+                        <label for="comment" class="form-label fw-bold">COMMENT</label>
+                        <textarea type="text" class="form-control" id="comment"
+                                  placeholder="댓글을 씁니다." name="content"></textarea>
+                        <button class="btn btn-primary" id="btn-comment" type="button">댓글달기</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-12"></div>
+            <div>
+                <ul id="comment-list">
+                    <th:block th:each="item : ${questionDto.commentList}">
+                        <li class="d-flex justify-content-between mb-2">
+                            <span th:text="${item.content}">댓글내용</span>
+                            <div>
+                                <button class="btn btn-sm btn-primary btn-del" th:data-id="${item.id}">DEL</button>
+                            </div>
+                        </li>
+                    </th:block>
+                </ul>
+            </div>
+
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+</div>
+<footer th:replace="~{fragments/footer}"></footer>
+
+<script th:inline="javascript">
+
+    const btnComment = document.querySelector("#btn-comment");
+    const comment = document.querySelector("#comment");
+    const commentList = document.querySelector("#comment-list");
+
+    const sendUrl = /*[[|/comment/write-ajax/${questionDto.id}|]]*/"/comment/write/3";
+    commentList.addEventListener("click", (e) => {
+        console.log(e.currentTarget);
+        console.log(e.target);
+        const btn = e.target.closest("button");
+        if (btn.classList.contains("btn-del")) {
+            console.log("button clicked");
+            const id = btn.dataset.id;
+            fetch("/comment/delete/" + id, {
+                method: "POST",
+                headers: {"Content-Type": "application/json;charset=UTF-8"},
+            })
+                .then(response => response.json())
+                .then(json => {
+                    if (json.isCommentDelete) {
+                        // console.log(json);
+                        // btn.closest("li").remove();
+                        btn.parentNode.parentNode.remove();
+                    }
+                })
+        }
+    })
+
+
+    btnComment.addEventListener("click", (e) => {
+        e.preventDefault();
+        const sendData = {content: comment.value};
+
+        fetch(sendUrl, {
+            method: "POST",
+            headers: {"Content-Type": "application/json;charset=UTF-8"},
+            body: JSON.stringify(sendData)
+        })
+            .then(response => response.json())
+            .then(json => {
+                if (json.comment) {
+                    commentList.innerHTML +=
+                        `<li class="d-flex justify-content-between mb-2">
+                    <span>${json.comment.content}</span>
+                    <div>
+                        <button class="btn btn-sm btn-primary btn-del" data-id="${json.comment.id}">DEL</button>
+                    </div>
+                </li>`;
+                    comment.value = "";
+                }
+            })
+    });
+
+
+</script>
+</body>
+
+<head th:replace="~{fragments/head::myHead('WRITE')}"></head>
+</html>
